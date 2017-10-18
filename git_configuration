@@ -1,0 +1,115 @@
+
+
+一、配置github环境
+
+1、环境：Ubuntu16.06
+
+2、注册github 帐号
+
+3、安装配置git服务器：
+
+（1）安装ssh：sudo apt-get install openssh-server openssh-client
+
+（2）启动ssh服务：sudo /etc/init.d/ssh restart
+
+（3）安装git服务器：sudo apt-get install git-core
+
+4、安装&配置ssh公钥
+
+cd  ~/.ssh   ls
+检查是否已井具有ssh keys(id_rsa（私钥）和id_rsa.pub（公钥）这两个文件)，如果已经具有，则进行 1'，否则，1
+
+// (1') 备份并移除已经存在的ssh keys
+		mkdir key_backup  cp id_rsa* key_backup rm id_rsa*    //即将已经存在的id_rsa，id_rsa.pub文件备份到key_backup文件夹
+
+（1）本地生成ssh公钥：ssh-keygen -C -t rsa "你的github对应的邮箱地址"    //这条命令会在当前用户目录~/.ssh/下生成密钥文件
+（2）测试畅通性：ssh -v git@github.com
+
+（3）将刚刚创建的ssh keys添加到github中 ：
+    点击账户中的profile，选择SSH and GPG keys，点击New SSH key，把~/.ssh/id_rsa.pub中的内容全部复制到Key编辑框中，点击上传。如下图
+
+（4）回复邮件：公钥上传后，github会往你的邮箱发送确认邮件，需要点击确认。 
+
+
+     
+
+此时，发现github上已有了SSH keys
+
+注1：之前在设置公钥时如果设置了密码，在该步骤会要求输入密码，那么，输入当时设置的密码即可。
+
+注2：通过以上的设置之后，就能够通过SSH的方式，直接使用Git命令访问GitHub托管服务器了
+
+
+二、使用github管理项目
+
+1、在本地创建一个文件夹作为仓库
+2、仓库初始化：进入需要版本控制的项目目录
+
+输入命令：git init
+
+注：运行完后，会发现目录多了一个.git隐藏文件夹
+
+3、配置git：
+
+（1）输入命令：git config --global user.name "你的github用户名"
+
+（2）输入命令：git config --global user.email 你的github邮箱地址
+
+4、添加托管文件：
+
+输入命令：git add ./
+
+注：这是添加目录下所有文件，如果只是添加某个文件，就将文件名字列出，如果添加目录，则可以用*代替。
+
+5、commit项目：
+
+输入命令：git commit -m "描述信息"
+
+注：-m参数后面跟着本次提交的描述信息，可以是修改了哪些代码，新增了哪些功能等等。
+
+6、上传项目：
+
+（1）输入命令：git remote add origin 仓库地址
+
+（2）输入命令：git push -u origin master
+
+
+注：
+
+（1）“仓库地址”可以在github的该项目仓库中查看
+ 若仓库地址写成 git remote add origin https://github.com/Forget2/master.git 这种http的格式，会出现每次push都要输入用户名及密码的情况，将“仓库地址”改为git remote add origin git@github.com:Forget2/master.git ssh的格式 ; 若提示"origin"已存在， 则执行 git remote rm origin  在重置“仓库地址”
+
+（2）“git remote add origin 仓库地址”：这个命令只用输一次，以后就不用再输入了，直接git add，git commit，git pull，git push。
+ 若首次提交，git commit 时，没有加仓库地址， 则在推送至仓库时必须用git push -u origin master。 可用上述方法删除origin，重新配置
+
+三、git常用命令：
+
+1、git clone 仓库地址  //克隆仓库代码到本地
+
+2、git diff  //查看本地代码与远程代码有哪些不同
+
+3、git pull //从远程拿到最新版本代码（提交代码时，忌讳直接提交。每次提交代码之前，一定要保证本地的代码是最新的，即先执行git pull）
+
+4、git branch //查看本地代码属于仓库的哪个分支
+
+5、git branch -a //查看仓库都有哪些分支
+
+6、git checkout 分支名 //切换分支（注：不建议使用，最好给一个分支单独建立一个文件夹）
+
+7、git clone -b 分支名 仓库地址 //克隆指定分支的仓库代码到本地
+
+8、git push -u origin 分支名（分支名通常为master）
+
+四、git常见问题： 
+
+git pull失败问题：有时候git pull会出现失败的情况，即本地代码和远程代码出现冲突，这种情况需要手动解决。
+
+解决冲突方法：
+
+1、git stash //将本地文件回馈上一步操作
+
+2、git pull   //将新代码下载下来
+
+3、git stash pop //会将已经冲突的文件合并，代码中会出现 “<<<<<” 和 “>>>>>”的符号，符号之间的代码就是本地和远程的冲突的部分，协商去解决。
+
+4、解决好后再git pull，git commit，git push
